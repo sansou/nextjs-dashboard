@@ -21,8 +21,8 @@ const FormSchema = z.object({
   customerId: z.string({
     invalid_type_error: 'Please select a customer'
   }),
-  amount: z.coerce.number().gt(0, {message:'Please enter an amount greater than $0.'}),
-  status: z.enum(['pending', 'paid'], {invalid_type_error: 'Please select an invoice status'}),
+  amount: z.coerce.number().gt(0, { message: 'Please enter an amount greater than $0.' }),
+  status: z.enum(['pending', 'paid'], { invalid_type_error: 'Please select an invoice status' }),
   date: z.string(),
 });
 
@@ -51,7 +51,8 @@ export async function createInvoice(prevState: State, formData: FormData) {
       VALUES (${customerId}, ${amountInCents}, ${status}, ${date})
       `;
   } catch (error) {
-    return { message: 'Database erro. Failed to create Invoice.' }
+    return { message: 'Database erro. Failed to create Invoice.', error: error }
+
   }
 
   revalidatePath('/dashboard/invoices');
@@ -66,7 +67,7 @@ export async function updateInvoice(id: string, prevState: State, formData: Form
     amount: formData.get('amount'),
     status: formData.get('status'),
   });
-  
+
   if (!validatedFields.success) {
     return {
       errors: validatedFields.error.flatten().fieldErrors,
@@ -84,7 +85,7 @@ export async function updateInvoice(id: string, prevState: State, formData: Form
       WHERE id = ${id}
     `;
   } catch (error) {
-    return { message: 'Database error. Failed to update Invoice.' }
+    return { message: 'Database error. Failed to update Invoice.', error: error}
   }
 
   revalidatePath('/dashboard/invoices');
@@ -97,7 +98,7 @@ export async function deleteInvoice(id: string) {
     revalidatePath('/dashboard/invoices');
     return { message: 'Delete Invoice' }
   } catch (error) {
-    return { message: 'Database error. Failed to delete Invoice' }
+    return { message: 'Database error. Failed to delete Invoice', error: error }
   }
 }
 
